@@ -1,0 +1,31 @@
+name: Auto Move Issues and PRs
+
+on:
+  issues:
+    types: [opened, assigned, closed]
+  pull_request:
+    types: [opened, closed]
+
+jobs:
+  move_project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Move Issue to Backlog when Created
+        if: github.event_name == 'issues' && github.event.action == 'opened'
+        run: |
+          gh project issue add --project YOUR_PROJECT_ID --issue ${GITHUB_EVENT_PATH} --status "Backlog"
+
+      - name: Move Issue to In Progress when Assigned
+        if: github.event_name == 'issues' && github.event.action == 'assigned'
+        run: |
+          gh project issue add --project 2 --issue ${GITHUB_EVENT_PATH} --status "In Progress"
+
+      - name: Move PR to In Review when Opened
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+        run: |
+          gh project pr add --project 2 --pr ${GITHUB_EVENT_PATH} --status "Under review"
+
+      - name: Move PR to Completed when Merged
+        if: github.event_name == 'pull_request' && github.event.action == 'closed'
+        run: |
+          gh project pr add --project 2 --pr ${GITHUB_EVENT_PATH} --status "Done"
