@@ -14,20 +14,23 @@ jobs:
         run: sudo apt update && sudo apt install gh -y
 
       - name: Autenticar en GitHub CLI
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+        run: gh auth login --with-token ${{ secrets.GITHUB_TOKEN }} --hostname github.com
 
       - name: Mover Issue a "Backlog" cuando se cree
         if: github.event_name == 'issues' && github.event.action == 'opened'
-        run: gh project item-add --2 --issue ${GITHUB_EVENT_PATH} --status "Backlog"
+        run: gh project item-add --project 2 --issue $(jq --raw-output .issue.number "$GITHUB_EVENT_PATH") --status "Backlog"
 
       - name: Mover Issue a "In progress" cuando se asigne
         if: github.event_name == 'issues' && github.event.action == 'assigned'
-        run: gh project item-add --2 --issue ${GITHUB_EVENT_PATH} --status "In progress"
+        run: gh project item-add --project 2 --issue $(jq --raw-output .issue.number "$GITHUB_EVENT_PATH") --status "In progress"
+
 
       - name: Mover PR a "Under review" cuando se abra
         if: github.event_name == 'pull_request' && github.event.action == 'opened'
-        run: gh project item-add --project 2 --pr ${GITHUB_EVENT_PATH} --status "Under review"
+        run: gh project item-add --project 2 --issue $(jq --raw-output .issue.number "$GITHUB_EVENT_PATH") --status "Under review"
+
 
       - name: Mover PR a "Done" cuando se fusione
         if: github.event_name == 'pull_request' && github.event.action == 'closed'
-        run: gh project item-add --project 2 --pr ${GITHUB_EVENT_PATH} --status "Done"
+        run: gh project item-add --project 2 --issue $(jq --raw-output .issue.number "$GITHUB_EVENT_PATH") --status "Done"
+
