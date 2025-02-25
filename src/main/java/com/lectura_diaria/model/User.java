@@ -21,6 +21,12 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String name;
+    private String nombre;
+
+    @Column(nullable = false)
+    private String proveedor;
+
+    @Column(nullable = false)
+    private String uid;
 
 }
